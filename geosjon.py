@@ -50,11 +50,27 @@ def compress_json(input_file):
         json.dump(data, f_out, separators=(',', ':'))
 
 
+def shp_to_geojson(shp_file, geojson_file):
+    """
+    将SHP文件转换为GeoJSON文件，并保留属性值
+
+    参数:
+        shp_file (str): SHP文件路径
+        geojson_file (str): 输出的GeoJSON文件路径
+    """
+    # 读取SHP文件
+    gdf = gpd.read_file(shp_file)
+    # 将GeoDataFrame转换为GeoJSON
+    gdf.to_file(geojson_file, driver='GeoJSON')
+    print("转换完成！")
+
+
 if __name__ == '__main__':
     # 示例用法
-    file1 = '1_80e5d9341fcf4c0984eb990b96855117.geojson'
-    file2 = '1_beb1286cf51d42c39d8ba6bf6cdf3a7c.geojson'
-    output_file = 'merged2.geojson'
+    # file1 = '1_80e5d9341fcf4c0984eb990b96855117.geojson'
+    # file2 = '1_beb1286cf51d42c39d8ba6bf6cdf3a7c.geojson'
+    # output_file = 'merged2.geojson'
 
     # 调用方法合并GeoJSON文件
-    merge_geojson_files(file1, file2, output_file)
+    # merge_geojson_files(file1, file2, output_file)
+    shp_to_geojson("/Users/author/Desktop/gis/test/test.shp", "data/data.geojson")

@@ -1,7 +1,5 @@
-import configparser
-
 import psycopg2
-
+import config as cf
 
 class PGSQLUtil:
     """
@@ -11,7 +9,7 @@ class PGSQLUtil:
     def __init__(self, config_file="config.ini"):
         """构造函数"""
         # 从配置文件中读取数据库连接配置
-        config = self.read_config(config_file)
+        config = cf.read_config(config_file)
         host = config.get('postgresql', 'host')
         port = config.getint('postgresql', 'port')
         database = config.get('postgresql', 'database')
@@ -27,12 +25,6 @@ class PGSQLUtil:
             password=password
         )
         self.__cursor = self.__conn.cursor()
-
-    def read_config(self, config_file):
-        """从INI配置文件中读取配置"""
-        config = configparser.ConfigParser()
-        config.read(config_file)
-        return config
 
     def __del__(self):
         """析构函数"""
