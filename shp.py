@@ -1,4 +1,5 @@
 import geopandas as gpd
+from shapely import Point
 
 
 def geojson_to_shp(geojson_file, shp_file):
@@ -55,13 +56,55 @@ def filter_shp_by_query(input_shp, output_shp, query):
     print("生成新的SHP文件完成！")
 
 
+def find_polygon_for_point(point, shp_file, query):
+    """
+    查询一个坐标点在SHP文件中符合条件的多边形中
+
+    参数:
+        point (tuple): 要查询的点的坐标，格式为 (经度, 纬度)
+        shp_file (str): SHP文件的路径
+        query (str): 查询条件，类似SQL的语法
+    返回:
+        str: 符合条件的多边形的属性值，如果没有符合条件的多边形，则返回None
+    """
+    # 创建点对象
+    point_geom = Point(point)
+    # 读取SHP文件为GeoDataFrame对象
+    gdf = gpd.read_file(shp_file)
+    # 判断点是否在SHP文件的范围内
+    filtered_gdf = gdf
+    if query is not None:
+        # 使用查询条件筛选多边形
+        filtered_gdf = gdf.query(query)
+    # 遍历筛选后的多边形，查找包含点的多边形
+    for index, row in filtered_gdf.iterrows():
+        if row.geometry.contains(point_geom):
+            print(f"index: {index}, geometry: {row.geometry}")
+            return row  # 替换为实际的属性字段名
+
+    return None
+
+
 if __name__ == '__main__':
     # 调用方法进行转换
     # geojson_file = "data/data.geojson"
     # shp_file = "data/output.shp"
     # geojson_to_shp(geojson_file, shp_file)
+
     # 调用方法进行过滤和生成新的SHP文件
-    input_shp = "data/output.shp"
-    output_shp = "data/test.shp"
-    query = "cun == '056'"
-    filter_shp_by_query(input_shp, output_shp, query)
+    # input_shp = "data/output.shp"
+    # output_shp = "data/test.shp"
+    # query = "cun == '056'"
+    # filter_shp_by_query(input_shp, output_shp, query)
+
+    # 调用方法进行查询 注意x,y顺序
+    # point = (37.375671, 121.717757)
+    # point = (37.381003, 121.722481)
+    # point = (121.706408, 37.375153)
+    # point = (121.706046, 37.374998)
+    # point = (121.710019, 37.377302)
+    point = (121.709216, 37.373135)
+    shp_file = "test.shp"
+    # query = "属性字段 = '条件值'"  # 替换为实际的查询条件
+    result = find_polygon_for_point(point, shp_file, None)
+    print(result)
