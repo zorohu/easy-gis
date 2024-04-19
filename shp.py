@@ -1,4 +1,5 @@
 import geopandas as gpd
+from pyproj import Transformer
 from shapely import Point
 
 
@@ -85,6 +86,29 @@ def find_polygon_for_point(point, shp_file, query):
     return None
 
 
+def project_coordinates(input_file, output_file, input_crs, output_crs):
+    """
+    将坐标投影转换为指定的坐标系
+
+    参数:
+        input_file (str): 输入文件的路径（支持常见的地理数据格式，如SHP、GeoJSON等）
+        output_file (str): 输出文件的路径（生成的投影转换后的地理数据）
+        input_crs (str): 输入坐标系的EPSG代码或proj4字符串
+        output_crs (str): 输出坐标系的EPSG代码或proj4字符串
+    """
+    # 读取输入文件为GeoDataFrame对象
+    gdf = gpd.read_file(input_file)
+
+    # 创建坐标转换器
+    transformer = Transformer.from_crs(input_crs, output_crs, always_xy=True)
+
+    # 进行坐标转换
+    gdf['geometry'] = gdf['geometry'].to_crs(output_crs)
+
+    # 将转换后的结果保存为新文件
+    gdf.to_file(output_file, driver='ESRI Shapefile')
+
+
 if __name__ == '__main__':
     # 调用方法进行转换
     # geojson_file = "data/data.geojson"
@@ -103,8 +127,16 @@ if __name__ == '__main__':
     # point = (121.706408, 37.375153)
     # point = (121.706046, 37.374998)
     # point = (121.710019, 37.377302)
-    point = (121.709216, 37.373135)
-    shp_file = "test.shp"
-    # query = "属性字段 = '条件值'"  # 替换为实际的查询条件
-    result = find_polygon_for_point(point, shp_file, None)
-    print(result)
+    # point = (121.709216, 37.373135)
+    # shp_file = "test.shp"
+    # # query = "属性字段 = '条件值'"  # 替换为实际的查询条件
+    # result = find_polygon_for_point(point, shp_file, None)
+    # print(result)
+
+    # 指定输入文件、输出文件、输入坐标系和输出坐标系
+    input_file = "data/test.shp"
+    output_file = "output.shp"
+    input_crs = "EPSG:4490"  # WGS84 经纬度坐标系
+    output_crs = "EPSG:3857"  # Web Mercator 投影坐标系
+    # 执行投影转换
+    project_coordinates(input_file, output_file, input_crs, output_crs)
