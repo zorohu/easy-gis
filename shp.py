@@ -1,5 +1,6 @@
-import fiona
+# import fiona
 import geopandas as gpd
+from geopandas.io.file import fiona
 from pyproj import Transformer
 from shapely import Point
 from shapely.ops import transform
@@ -165,6 +166,25 @@ def project_convertor(src_path, dst_path, convert_type):
                 out.write(fea)
 
 
+def delete_attributes(input_file, output_file, attributes):
+    """
+    从Shapefile中删除指定的属性列
+
+    参数:
+        input_file (str): 输入Shapefile文件的路径
+        output_file (str): 输出Shapefile文件的路径
+        attributes (list): 要删除的属性列的名称列表
+    """
+    # 读取输入Shapefile文件为GeoDataFrame对象
+    gdf = gpd.read_file(input_file)
+
+    # 删除指定的属性列
+    gdf.drop(columns=attributes, inplace=True)
+
+    # 保存删除属性后的结果为新Shapefile文件
+    gdf.to_file(output_file)
+
+
 if __name__ == '__main__':
     # 调用方法进行转换
     # geojson_file = "data/data.geojson"
@@ -190,9 +210,16 @@ if __name__ == '__main__':
     # print(result)
 
     # 指定输入文件、输出文件、输入坐标系和输出坐标系
-    input_file = "data/test.shp"
-    output_file = "output.shp"
-    # input_crs = "EPSG:4490"  # WGS84 经纬度坐标系
-    output_crs = "EPSG:3857"  # Web Mercator 投影坐标系
-    # 执行投影转换
-    project_convertor(input_file, output_file, "wgs2gcj")
+    # input_file = "data/test.shp"
+    # output_file = "output.shp"
+    # # input_crs = "EPSG:4490"  # WGS84 经纬度坐标系
+    # output_crs = "EPSG:3857"  # Web Mercator 投影坐标系
+    # # 执行投影转换
+    # project_convertor(input_file, output_file, "wgs2gcj")
+
+    # 示例用法
+    input_file = 'data/test.shp'
+    output_file = 'output.shp'
+    attributes_to_delete = ['bhnd']  # 要删除的属性列的名称列表
+
+    delete_attributes(input_file, output_file, attributes_to_delete)
