@@ -39,6 +39,24 @@ def merge_geojson_files(file1, file2, output_file):
     compress_json(output_file)
 
 
+def merge_geojson_list(file_list, output_file):
+    merged_gdf = None  # 用于存储合并后的GeoDataFrame
+
+    for file in file_list:
+        # 读取当前文件的GeoDataFrame
+        gdf = gpd.read_file(file)
+
+        if merged_gdf is None:
+            merged_gdf = gdf
+        else:
+            # 合并当前文件的GeoDataFrame到已合并的GeoDataFrame
+            merged_gdf = pd.concat([merged_gdf, gdf], ignore_index=True)
+    # 保存合并后的GeoJSON文件
+    merged_gdf.to_file(output_file, driver='GeoJSON')
+    # 压缩生成的GeoJSON文件
+    compress_json(output_file)
+
+
 def compress_json(input_file):
     # 读取输入文件
     with open(input_file, 'r') as f_in:
@@ -62,6 +80,8 @@ def shp_to_geojson(shp_file, geojson_file):
     gdf = gpd.read_file(shp_file)
     # 将GeoDataFrame转换为GeoJSON
     gdf.to_file(geojson_file, driver='GeoJSON')
+    # 压缩生成的GeoJSON文件
+    compress_json(geojson_file)
     print("转换完成！")
 
 
@@ -73,4 +93,27 @@ if __name__ == '__main__':
 
     # 调用方法合并GeoJSON文件
     # merge_geojson_files(file1, file2, output_file)
-    shp_to_geojson("/Users/author/Desktop/gis/test/test.shp", "data/data.geojson")
+    shp_to_geojson("/Users/author/Desktop/37shandong370602/370602out-filter.shp",
+                   "/Users/author/Desktop/37shandong370602/370602out-filter.geojson")
+    # 示例用法
+    # file_list = [
+    #     '/Users/author/Desktop/37shandong370602/370602/1ae33b5393094129b403bd97b8b9d9ea.geojson',
+    #     '/Users/author/Desktop/37shandong370602/370602/30af738770744c399dbf9c8e58ddf089.geojson',
+    #     '/Users/author/Desktop/37shandong370602/370602/51652d23526844fb9e779e07895fafaf.geojson',
+    #     '/Users/author/Desktop/37shandong370602/370602/6d43b8c5a08941fcbe12818375624e03.geojson',
+    #     '/Users/author/Desktop/37shandong370602/370602/75430b139ed4494db404b0cc2d876116.geojson',
+    #     '/Users/author/Desktop/37shandong370602/370602/819aff30646b4d08bf5af17b106af1b7.geojson',
+    #     '/Users/author/Desktop/37shandong370602/370602/8f470c0f46854c33bd788177b40c94b1.geojson',
+    #     '/Users/author/Desktop/37shandong370602/370602/9218db3073494e9bbfe74706e47fd99f.geojson',
+    #     '/Users/author/Desktop/37shandong370602/370602/95c5dc84e2ed40fd93b53c42aa1a9f5b.geojson',
+    #     '/Users/author/Desktop/37shandong370602/370602/af0d96d1094245f68b7219846b690fd1.geojson',
+    #     '/Users/author/Desktop/37shandong370602/370602/d447491157bb40468aac55f9d40e9f3e.geojson',
+    #     '/Users/author/Desktop/37shandong370602/370602/d762f9494de44e5aab4b67027c78929c.geojson',
+    #     '/Users/author/Desktop/37shandong370602/370602/da5f817d96d94d86a5328455e3bdf24d.geojson',
+    #     '/Users/author/Desktop/37shandong370602/370602/ea6a3d2cd1b74bf1b1260f8a254e421a.geojson',
+    #     # 添加其他文件...
+    # ]
+    # basePath = '/Users/author/Desktop/37shandong370602/370602'
+    # output_file = '/Users/author/Desktop/37shandong370602/370602out.geojson'
+    # merge_geojson_list(file_list, output_file)
+    # compress_json('/Users/author/Documents/test.geojson')

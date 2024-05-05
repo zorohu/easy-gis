@@ -153,7 +153,7 @@ def project_convertor(src_path, dst_path, convert_type):
         source_schema = source.schema.copy()
         with fiona.open(dst_path, 'w', encoding='utf-8', **source.meta) as out:
             transform = Transform()
-            f = lambda x: getattr(transform, convert_type)(x[0], x[1])  #dynamic call convert func
+            f = lambda x: getattr(transform, convert_type)(x[0], x[1])  # dynamic call convert func
 
             for fea in source:
                 collections = fea['geometry']['coordinates']
@@ -185,17 +185,98 @@ def delete_attributes(input_file, output_file, attributes):
     gdf.to_file(output_file)
 
 
+def process_attributes(input_file, output_file):
+    """
+    从原始Shapefile文件中提取属性并添加为新的属性列
+
+    参数:
+        input_file (str): 原始Shapefile文件的路径
+        output_file (str): 输出Shapefile文件的路径
+    """
+    # 读取原始Shapefile文件为GeoDataFrame对象
+    gdf = gpd.read_file(input_file)
+    # 根据需要进行属性处理，提取所需的部分并进行格式转换
+    gdf['xb_num'] = gdf['banId'].str.split('-').str[0]
+    # 保存包含新属性的GeoDataFrame为Shapefile文件
+    gdf.to_file(output_file)
+
+
 if __name__ == '__main__':
     # 调用方法进行转换
-    # geojson_file = "data/data.geojson"
-    # shp_file = "data/output.shp"
-    # geojson_to_shp(geojson_file, shp_file)
+    geojson_file = "/Users/author/Desktop/37shandong370602/370602out_compress.geojson"
+    shp_file = "/Users/author/Desktop/37shandong370602/370602out.shp"
+    geojson_to_shp(geojson_file, shp_file)
+
+    # 示例用法
+    # input_file = '/Users/author/Desktop/37shandong370211/xian_370211.shp'
+    # output_file = '/Users/author/Desktop/37shandong370211/out1.shp'
+    #
+    # process_attributes(input_file, output_file)
 
     # 调用方法进行过滤和生成新的SHP文件
-    # input_shp = "data/output.shp"
-    # output_shp = "data/test.shp"
-    # query = "cun == '056'"
-    # filter_shp_by_query(input_shp, output_shp, query)
+    input_shp = "/Users/author/Desktop/37shandong370602/370602out.shp"
+    output_shp = "/Users/author/Desktop/37shandong370602/370602out-filter.shp"
+    values = [
+        '37060200601400132',
+        '37060200900100237',
+        '37060200900200257',
+        '37060200900100240',
+        '37060200900200256',
+        '37060200900200071',
+        '37060200800200409',
+        '37060200800200418',
+        '37060200800200195',
+        '37060200800100207',
+        '37060200800200436',
+        '37060200800200427',
+        '37060200800200447',
+        '37060200800200419',
+        '37060200800200440',
+        '37060200800200400',
+        '37060200800200454',
+        '37060200800200415',
+        '37060200800200403',
+        '37060200800100240',
+        '37060200800100220',
+        '37060200800200449',
+        '37060200800200425',
+        '37060200800200423',
+        '37060200800200424',
+        '37060200800200412',
+        '37060200800200422',
+        '37060200800200421',
+        '37060200800100249',
+        '37060200800200456',
+        '37060200800200443',
+        '37060200800200444',
+        '37060200800100245',
+        '37060200800200429',
+        '37060200800200473',
+        '37060200800200411',
+        '37060200800100226',
+        '37060200800200439',
+        '37060200800200445',
+        '37060200800200451',
+        '37060200800200420',
+        '37060200800200410',
+        '37060200800200413',
+        '37060200800200414',
+        '37060200800200435',
+        '37060200800200066',
+        '37060200800200432',
+        '37060200800200431',
+        '37060200800200426',
+        '37060200800100209',
+        '37060200800200472',
+        '37060200800100219',
+        '37060200800200404',
+        '37060200601300163',
+        '37060200601300166',
+        '37060200800200471',
+        '37060200800100227'
+    ]
+    query = f"xb_num in {tuple(values)}"
+    filter_shp_by_query(input_shp, output_shp, query)
 
     # 调用方法进行查询 注意x,y顺序
     # point = (37.375671, 121.717757)
@@ -218,8 +299,8 @@ if __name__ == '__main__':
     # project_convertor(input_file, output_file, "wgs2gcj")
 
     # 示例用法
-    input_file = 'data/test.shp'
-    output_file = 'output.shp'
-    attributes_to_delete = ['bhnd']  # 要删除的属性列的名称列表
-
-    delete_attributes(input_file, output_file, attributes_to_delete)
+    # input_file = 'data/test.shp'
+    # output_file = 'output.shp'
+    # attributes_to_delete = ['bhnd']  # 要删除的属性列的名称列表
+    #
+    # delete_attributes(input_file, output_file, attributes_to_delete)
