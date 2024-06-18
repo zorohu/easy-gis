@@ -1,11 +1,61 @@
+import json
 import os
 
 import shp
 import geosjon
 import utils
 import config
+import pgsql_util
+from geoalchemy2 import Geometry, WKTElement
 
 if __name__ == '__main__':
+    with open('/Users/author/Desktop/8a181c813bf0493592a86f400811d0e7.geojson', 'r') as f:
+        geojson_data = json.load(f)
+
+    for feature in geojson_data['features']:
+        properties = feature['properties']
+        geometry = feature['geometry']
+
+        insert_query = """
+        INSERT INTO your_table_name (
+            id, ban_resource_year, city, county, di_lei, di_mao, is_pine, lat, ld_cd, ld_kd, lin_ban, lin_chang,
+            lin_ye_ju, lng, location, mian_ji, ping_jun_xj, po_du, po_wei, po_xiang, province, status, town,
+            tu_ceng_hd, village, xb_num, xiao_ban, you_shi_sz_code, yu_bi_du
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        values = (
+            properties['id'],
+            properties['ban_resource_year'],
+            properties['city'],
+            properties['county'],
+            properties['di_lei'],
+            properties['di_mao'],
+            properties['is_pine'],
+            properties['lat'],
+            properties['ld_cd'],
+            properties['ld_kd'],
+            properties['lin_ban'],
+            properties['lin_chang'],
+            properties['lin_ye_ju'],
+            properties['lng'],
+            WKTElement(json.dumps(geometry), srid=4490),
+            properties['mian_ji'],
+            properties['ping_jun_xj'],
+            properties['po_du'],
+            properties['po_wei'],
+            properties['po_xiang'],
+            properties['province'],
+            properties['status'],
+            properties['town'],
+            properties['tu_ceng_hd'],
+            properties['village'],
+            properties['xb_num'],
+            properties['xiao_ban'],
+            properties['you_shi_sz_code'],
+            properties['yu_bi_du']
+        )
+
     config = config.read_config('config.ini')
     sections = config.sections()
     for section in sections:
@@ -63,4 +113,3 @@ if __name__ == '__main__':
         # 5生成json文件
         geosjon.shp_to_geojson("{}/{}out-filter.shp".format(basePath, xian),
                                "{}/{}out-filter.geojson".format(basePath, xian))
-
