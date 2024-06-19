@@ -24,7 +24,7 @@ def convert_location(location_str):
 
 
 if __name__ == '__main__':
-    with open('/Users/author/Desktop/8a181c813bf0493592a86f400811d0e7.geojson', 'r') as f:
+    with open('/Users/author/Desktop/341822001.geojson', 'r') as f:
         geojson_data = json.load(f)
     pgsqlUtil = pgsql_util.PGSQLUtil()
     pgsqlUtil.get_version()
@@ -48,10 +48,14 @@ if __name__ == '__main__':
         %s, %s, %s, %s, %s,
          %s, %s, ST_SetSRID(ST_GeomFromGeoJSON(%s), 4490))
         """
+        if 'location' in properties:
+            location_parts = properties['location'].split(',')
+            lng = location_parts[0]
+            lat = location_parts[1]
+        else:
+            lng = properties['lng']
+            lat = properties['lat']
 
-        location_parts = properties['location'].split(',')
-        lng = location_parts[0]
-        lat = location_parts[1]
         id = properties['id']
         geom_wkt = json.dumps(geometry)
         geo = convert_location(geom_wkt)
